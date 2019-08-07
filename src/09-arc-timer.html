@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../libs/d3.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+</body>
+<script>
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
+    let innerRadius = 100;
+    let outerRadius = 300;
+    let cornerRadius = 10;
+
+    let data = [1, 1, 2, 3, 5, 8, 13, 21];
+
+    // pie函数生产带arc参数的数据(startAngle, endAngle, padAngle)
+    let pie = d3.pie();
+
+    // 使用带arc参数的数据算出path路径值
+    let arc = d3.arc()
+        .cornerRadius(cornerRadius)
+        .outerRadius(outerRadius);
+
+    // 添加svg容器let
+    let svg = d3.select('body').append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .classed('arc-timer', true);
+
+    // 添加pie group
+    let gPie = svg.append('g')
+        .attr('transform', `translate(${width / 2}, ${height / 2})`)
+        .classed('pie', true)
+        .selectAll('path')
+        .data(data)
+        .enter().append('path');
+
+    let ease = d3.easeCubicOut;
+    let duration = 2000;
+
+
+    d3.timer((elapsed) => {
+        let t = ease(1 - Math.abs((elapsed % duration) / duration - .5) * 2),
+            arcs = pie.padAngle(t * .1)(data);
+
+        arc.innerRadius(outerRadius / (3 - t));
+
+        gPie.data(arcs).attr('d', arc);
+    });
+</script>
+</html>
